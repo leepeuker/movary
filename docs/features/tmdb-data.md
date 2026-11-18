@@ -54,7 +54,7 @@ php bin/console.php tmdb:movie:sync --hours 48 --threshold 50
 
 Set `TMDB_ENABLE_IMAGE_CACHING=1` to store local copies of TMDB images instead of loading them from TMDB for every request. Persist the `storage` directory so cached images survive container recreation or application upgrades.
 
-To cache selected images, open **Settings → Server → Job Queue**, create a **TMDB image cache refresh** job, and enter at least one local movie or person ID. A movie job also caches images for its cast and crew. Targeted image-cache jobs can also be configured under **Settings → Server → Job Schedules**.
+To cache selected images, open **Settings → Server → Job Queue**, create a **TMDB image cache refresh** job, and enter at least one local movie or person ID. A movie job caches its poster and backdrop, as well as images for its cast and crew. Movie pages use the TMDB backdrop directly until a cached copy is available. Targeted image-cache jobs can also be configured under **Settings → Server → Job Schedules**.
 
 Command-line access additionally supports refreshing the complete cache:
 

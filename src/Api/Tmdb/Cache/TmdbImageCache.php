@@ -132,7 +132,8 @@ class TmdbImageCache
     {
         $cachedImages = 0;
 
-        $query = "SELECT id, poster_path, tmdb_poster_path, tmdb_poster_path_override FROM $resourceType";
+        $backdropColumn = $resourceType->isMovie() === true ? ', tmdb_backdrop_path' : '';
+        $query = "SELECT id, poster_path, tmdb_poster_path, tmdb_poster_path_override$backdropColumn FROM $resourceType";
         if (count($filerIds) > 0) {
             $placeholders = str_repeat('?, ', count($filerIds));
             $query .= ' WHERE id IN (' . trim($placeholders, ', ') . ')';
@@ -141,6 +142,22 @@ class TmdbImageCache
         $queryResult = $this->dbConnection->prepare($query)->executeQuery($filerIds);
 
         foreach ($queryResult->iterateAssociative() as $imageDataBeforeUpdate) {
+            if ($resourceType->isMovie() === true && empty($imageDataBeforeUpdate['tmdb_backdrop_path']) === false) {
+                try {
+                    if ($this->imageCacheService->cacheImage(
+                        $this->tmdbUrlGenerator->generateImageUrl($imageDataBeforeUpdate['tmdb_backdrop_path'], 'w1280'),
+                        $imageDataBeforeUpdate['id'],
+                        $resourceType,
+                        $forceRefresh,
+                        true,
+                    ) !== null) {
+                        $cachedImages++;
+                    }
+                } catch (Exception $e) {
+                    $this->logger->warning('Could not cache movie backdrop: ' . $imageDataBeforeUpdate['tmdb_backdrop_path'], ['exception' => $e]);
+                }
+            }
+
             if ($this->cacheImageDataByTableName($imageDataBeforeUpdate, $resourceType, $forceRefresh) === true) {
                 if ($imageDataBeforeUpdate['poster_path'] !== null) {
                     $statement = $this->dbConnection->prepare("SELECT poster_path FROM $resourceType WHERE id = ?");

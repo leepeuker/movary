@@ -28,6 +28,7 @@ class MovieEntity
         private readonly ?int $imdbRatingVoteCount,
         private readonly ?DateTime $updatedAtTmdb,
         private readonly ?DateTime $updatedAtImdb,
+        private readonly ?string $tmdbBackdropPath,
     ) {
     }
 
@@ -55,6 +56,7 @@ class MovieEntity
             $data['imdb_rating_vote_count'] === null ? null : (int)$data['imdb_rating_vote_count'],
             $data['updated_at_tmdb'] === null ? null : DateTime::createFromString($data['updated_at_tmdb']),
             $data['updated_at_imdb'] === null ? null : DateTime::createFromString($data['updated_at_imdb']),
+            $data['tmdb_backdrop_path'] ?? null,
         );
     }
 
@@ -116,6 +118,11 @@ class MovieEntity
     public function getTitle() : string
     {
         return $this->title;
+    }
+
+    public function getTmdbBackdropPath() : ?string
+    {
+        return $this->tmdbBackdropPath;
     }
 
     public function getTmdbId() : int

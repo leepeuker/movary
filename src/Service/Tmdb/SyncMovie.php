@@ -66,6 +66,7 @@ class SyncMovie
                 $createdMovie = true;
             } else {
                 $originalTmdbPosterPath = $movie->getTmdbPosterPath();
+                $originalTmdbBackdropPath = $movie->getTmdbBackdropPath();
 
                 $movie = $this->movieApi->updateDetails(
                     movieId: $movie->getId(),
@@ -82,8 +83,9 @@ class SyncMovie
                     originalTitle: $tmdbMovie->getOriginalTitle(),
                 );
 
-                if ($originalTmdbPosterPath !== $movie->getTmdbPosterPath()
-                    && $movie->getTmdbPosterPathOverride() === null
+                if (($originalTmdbPosterPath !== $movie->getTmdbPosterPath()
+                        && $movie->getTmdbPosterPathOverride() === null)
+                    || $originalTmdbBackdropPath !== $movie->getTmdbBackdropPath()
                 ) {
                     $this->jobScheduler->storeMovieIdForTmdbImageCacheJob($movie->getId());
                 }
