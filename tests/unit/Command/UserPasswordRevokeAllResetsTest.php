@@ -29,7 +29,7 @@ class UserPasswordRevokeAllResetsTest extends TestCase
             $this->createMock(LoggerInterface::class),
         );
         $application = new Application();
-        $application->add($command);
+        $application->addCommand($command);
         $this->tester = new CommandTester($command);
     }
 

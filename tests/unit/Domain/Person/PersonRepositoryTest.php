@@ -5,7 +5,6 @@ namespace Tests\Unit\Movary\Domain\Person;
 use ArrayIterator;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Statement;
 use Movary\Domain\Person\PersonRepository;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\SortOrder;
@@ -67,18 +66,16 @@ class PersonRepositoryTest extends TestCase
         $result = $this->createMock(Result::class);
         $result->expects(self::once())->method('iterateAssociative')->willReturn(new ArrayIterator());
 
-        $statement = $this->createMock(Statement::class);
-        $statement->expects(self::once())->method('executeQuery')->with([7, 8])->willReturn($result);
-
         $connection = $this->createMock(Connection::class);
         $connection
             ->expects(self::once())
-            ->method('prepare')
+            ->method('executeQuery')
             ->with(
                 'SELECT * FROM `person` WHERE updated_at_tmdb IS NULL AND id IN (?, ?) '
                 . 'ORDER BY updated_at_tmdb, created_at LIMIT 50',
+                [7, 8],
             )
-            ->willReturn($statement);
+            ->willReturn($result);
 
         $subject = new PersonRepository($connection);
 

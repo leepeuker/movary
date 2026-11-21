@@ -3,7 +3,7 @@
 namespace Movary\DatabaseMigration;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use RuntimeException;
@@ -17,7 +17,7 @@ final class Version20261014200000 extends AbstractMigration
 
     public function isTransactional() : bool
     {
-        return $this->platform instanceof SqlitePlatform;
+        return $this->platform instanceof SQLitePlatform;
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
@@ -45,7 +45,7 @@ final class Version20261014200000 extends AbstractMigration
             return;
         }
 
-        if ($this->platform instanceof SqlitePlatform) {
+        if ($this->platform instanceof SQLitePlatform) {
             $this->addSql('ALTER TABLE user ADD email_verified_at TEXT DEFAULT NULL');
             $this->addSql('UPDATE user SET email_verified_at = CURRENT_TIMESTAMP');
             $this->addSql(

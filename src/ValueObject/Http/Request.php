@@ -79,7 +79,7 @@ class Request
 
     private static function extractHeaders() : array
     {
-        return getallheaders();
+        return (array)getallheaders();
     }
 
     private static function extractPath(string $uri) : string

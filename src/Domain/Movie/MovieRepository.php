@@ -3,7 +3,7 @@
 namespace Movary\Domain\Movie;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Movary\Api\Trakt\ValueObject\TraktId;
 use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\ValueObject\Date;
@@ -263,7 +263,7 @@ class MovieRepository
             $query .= ' LIMIT ' . $limit;
         }
 
-        return $this->dbConnection->prepare($query)->executeQuery($ids ?? [])->iterateAssociative();
+        return $this->dbConnection->executeQuery($query, $ids ?? [])->iterateAssociative();
     }
 
     public function fetchAveragePersonalRating(int $userId) : float
@@ -669,7 +669,7 @@ class MovieRepository
 
     public function fetchMostWatchedReleaseYears(int $userId) : array
     {
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
             return $this->dbConnection->fetchAllAssociative(
                 <<<SQL
             SELECT strftime('%Y',release_date) as name, COUNT(*) as count
@@ -712,7 +712,7 @@ class MovieRepository
 
         $syncedFilter = '';
         if ($onlyNeverSynced === false) {
-            $syncedFilter = match ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+            $syncedFilter = match ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
                 true => 'OR updated_at_imdb <= datetime("now","-' . (int)$maxAgeInHours . ' hours")',
                 false => 'OR updated_at_imdb <= DATE_SUB(NOW(), INTERVAL ' . (int)$maxAgeInHours . ' HOUR)',
             };
@@ -956,7 +956,7 @@ class MovieRepository
 
     public function fetchUniqueMovieReleaseYears(int $userId) : array
     {
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
             return $this->dbConnection->fetchFirstColumn(
                 <<<SQL
                 SELECT DISTINCT strftime('%Y',release_date)
@@ -1022,7 +1022,7 @@ class MovieRepository
         $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
-            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+            if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
                 $whereQuery .= 'AND strftime(\'%Y\', m.release_date) = ? ';
             } else {
                 $whereQuery .= 'AND YEAR(m.release_date) = ? ';
@@ -1119,7 +1119,7 @@ class MovieRepository
         $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
-            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+            if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
                 $whereQuery .= 'AND strftime("%Y",m.release_date) = ? ';
             } else {
                 $whereQuery .= 'AND YEAR(m.release_date) = ? ';
@@ -1268,7 +1268,7 @@ class MovieRepository
 
     public function findByTitleAndYear(string $title, Year $releaseYear) : ?MovieEntity
     {
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
             $data = $this->dbConnection->fetchAssociative(
                 'SELECT * FROM `movie` WHERE (title = ? OR original_title = ?) AND strftime(\'%Y\',release_date) = ?',
                 [$title, $title, $releaseYear],

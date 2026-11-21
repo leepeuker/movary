@@ -152,7 +152,7 @@ class PersonRepository
             $query .= ' LIMIT ' . $limit;
         }
 
-        return $this->dbConnection->prepare($query)->executeQuery($ids ?? [])->iterateAssociative();
+        return $this->dbConnection->executeQuery($query, $ids ?? [])->iterateAssociative();
     }
 
     public function findByPersonId(int $personId) : ?PersonEntity

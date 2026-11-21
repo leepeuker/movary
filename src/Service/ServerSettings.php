@@ -433,7 +433,7 @@ class ServerSettings
     {
         $key = $this->convertEnvironmentKeyToDatabaseKey($environmentKey);
 
-        $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')->executeStatement([$key]);
+        $this->dbConnection->executeStatement('DELETE FROM `server_setting` WHERE `key` = ?', [$key]);
     }
 
     private function updateValue(string $environmentKey, mixed $value) : void
@@ -441,6 +441,6 @@ class ServerSettings
         $key = $this->convertEnvironmentKeyToDatabaseKey($environmentKey);
 
         $this->deleteValue($environmentKey);
-        $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([(string)$value, $key]);
+        $this->dbConnection->executeStatement('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)', [(string)$value, $key]);
     }
 }

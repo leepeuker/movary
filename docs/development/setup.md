@@ -28,6 +28,10 @@ Use the following cli commands to manage your local environment:
 - `make app_database_migrate` execute the database migrations
 - `make app_jobs_process` process the next job from the queue (see database table `job_queue`)
 
+### Static analysis
+
+`composer test-psalm` runs type checks. Psalm 7 enables taint analysis by default; the project keeps it opt-in to preserve the existing check scope. Run `vendor/bin/psalm -c settings/psalm.xml --taint-analysis` separately to investigate possible security issues.
+
 ### HTTP endpoint tests
 
 Run all standard checks and test suites, including the HTTP endpoint tests, with:
@@ -79,26 +83,7 @@ Commit `package.json`, `package-lock.json`, and the regenerated `public/vendor` 
 
 ### Xdebug
 
-You can change `XDEBUG_MODE` to `debug` in the `.env` file to enable debugging using [Xdebug](https://xdebug.org/) in the development docker container.
-
-For example, in VSCode or VSCodium, the following debug configuration would allow you to set breakpoints and debug the PHP code:
-
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Listen for Xdebug",
-      "type": "php",
-      "request": "launch",
-      "port": 9003,
-      "pathMappings": {
-        "/app": "${workspaceRoot}"
-      }
-    }
-  ]
-}
-```
+Xdebug is temporarily excluded from the development image while PHP 8.6 support requires a prerelease.
 
 ### IDE recommendation: PhpStorm
 

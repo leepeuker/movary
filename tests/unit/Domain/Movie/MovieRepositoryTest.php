@@ -4,9 +4,8 @@ namespace Tests\Unit\Movary\Domain\Movie;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Statement;
 use Movary\Domain\Movie\MovieRepository;
 use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\SortOrder;
@@ -150,7 +149,7 @@ class MovieRepositoryTest extends TestCase
         $this->dbConnectionMock
             ->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn($isSqlite === true ? new SqlitePlatform() : new MySQLPlatform());
+            ->willReturn($isSqlite === true ? new SQLitePlatform() : new MySQLPlatform());
 
         $this->dbConnectionMock
             ->expects(self::once())
@@ -169,17 +168,15 @@ class MovieRepositoryTest extends TestCase
         $result = $this->createMock(Result::class);
         $result->expects(self::once())->method('iterateAssociative')->willReturn(new \ArrayIterator());
 
-        $statement = $this->createMock(Statement::class);
-        $statement->expects(self::once())->method('executeQuery')->with([7, 8])->willReturn($result);
-
         $this->dbConnectionMock
             ->expects(self::once())
-            ->method('prepare')
+            ->method('executeQuery')
             ->with(
                 'SELECT * FROM `movie` WHERE updated_at_tmdb IS NULL AND id IN (?, ?) '
                 . 'ORDER BY updated_at_tmdb, created_at LIMIT 50',
+                [7, 8],
             )
-            ->willReturn($statement);
+            ->willReturn($result);
 
         iterator_to_array($this->subject->fetchAllOrderedByLastUpdatedAtTmdbAsc(50, [7, 8], true));
     }

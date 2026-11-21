@@ -30,7 +30,7 @@ class UserUpdateTest extends TestCase
             $this->createStub(LoggerInterface::class),
             $this->createStub(EmailVerificationRequestService::class),
         );
-        (new Application())->add($command);
+        (new Application())->addCommand($command);
         $tester = new CommandTester($command);
 
         $result = $tester->execute(['userId' => 7, '--password' => 'short']);
@@ -52,7 +52,7 @@ class UserUpdateTest extends TestCase
         $requestService = $this->createMock(EmailVerificationRequestService::class);
         $requestService->expects(self::once())->method('requestForUser')->with($user)->willReturn(true);
         $command = new UserUpdate($userApi, $this->createStub(LoggerInterface::class), $requestService);
-        (new Application())->add($command);
+        (new Application())->addCommand($command);
         $tester = new CommandTester($command);
 
         $result = $tester->execute(['userId' => 7, '--email' => 'new@example.com']);
@@ -71,7 +71,7 @@ class UserUpdateTest extends TestCase
         $requestService = $this->createStub(EmailVerificationRequestService::class);
         $requestService->method('requestForUser')->willReturn(false);
         $command = new UserUpdate($userApi, $this->createStub(LoggerInterface::class), $requestService);
-        (new Application())->add($command);
+        (new Application())->addCommand($command);
         $tester = new CommandTester($command);
 
         $result = $tester->execute(['userId' => 7, '--email' => 'typo@example.com']);
