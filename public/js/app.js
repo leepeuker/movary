@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         new Datepicker(document.getElementById('logPlayModalWatchDateInput'), {
             format: document.getElementById('dateFormatJavascript').value,
+            showOnFocus: false,
             title: 'Watch date',
         })
 
