@@ -129,7 +129,7 @@ class UserBootstrapAdminTest extends TestCase
             $userApi,
             $this->createStub(LoggerInterface::class),
         );
-        (new Application())->add($command);
+        (new Application())->addCommand($command);
 
         return new CommandTester($command);
     }

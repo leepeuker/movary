@@ -3,7 +3,7 @@
 namespace Movary\JobQueue;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\JobStatus;
@@ -29,12 +29,7 @@ class JobQueueRepository
             ],
         );
 
-        $lastInsertId = $this->dbConnection->lastInsertId();
-        if ($lastInsertId === false) {
-            throw new RuntimeException('Could not get last inserted id.');
-        }
-
-        return (int)$lastInsertId;
+        return (int)$this->dbConnection->lastInsertId();
     }
 
     /** @param non-empty-list<JobStatus> $statuses */
@@ -51,7 +46,7 @@ class JobQueueRepository
                 : $this->addJob($type, $status, $userId, $parameters);
         };
 
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
             return $this->dbConnection->transactional(function () use ($type, $addJob) : ?int {
                 // SQLite serializes writes, so this acquires its database write lock before the existence check.
                 $this->dbConnection->executeStatement(
@@ -89,7 +84,7 @@ class JobQueueRepository
                 : $this->addJob($type, $status, $userId, $parameters);
         };
 
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
             return $this->dbConnection->transactional(function () use ($type, $userId, $addJob) : ?int {
                 // SQLite serializes writes, so this acquires its database write lock before the existence check.
                 $this->dbConnection->executeStatement(

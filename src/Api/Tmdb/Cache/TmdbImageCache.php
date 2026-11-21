@@ -74,7 +74,7 @@ class TmdbImageCache
     {
         $this->cacheImages(ResourceType::createMovie(), false, [$movieId]);
 
-        $statement = $this->dbConnection->prepare(
+        $dbResult = $this->dbConnection->executeQuery(
             "SELECT DISTINCT (id)
             FROM (
                 SELECT id
@@ -87,8 +87,8 @@ class TmdbImageCache
                 JOIN movie_crew crew on person.id = crew.person_id
                 WHERE crew.movie_id = ?
             ) personIdTable",
+            [$movieId, $movieId],
         );
-        $dbResult = $statement->executeQuery([$movieId, $movieId]);
 
         $this->cacheImages(ResourceType::createPerson(), false, $dbResult->fetchFirstColumn());
     }
@@ -122,7 +122,7 @@ class TmdbImageCache
 
         $payload = [$cachedImagePublicPath, $data['id']];
 
-        return $this->dbConnection->prepare("UPDATE $resourceType SET poster_path = ? WHERE id = ?")->executeStatement($payload) === 1;
+        return $this->dbConnection->executeStatement("UPDATE $resourceType SET poster_path = ? WHERE id = ?", $payload) === 1;
     }
 
     /**
@@ -138,14 +138,14 @@ class TmdbImageCache
             $query .= ' WHERE id IN (' . trim($placeholders, ', ') . ')';
         }
 
-        $queryResult = $this->dbConnection->prepare($query)->executeQuery($filerIds);
+        $queryResult = $this->dbConnection->executeQuery($query, $filerIds);
 
         foreach ($queryResult->iterateAssociative() as $imageDataBeforeUpdate) {
             if ($this->cacheImageDataByTableName($imageDataBeforeUpdate, $resourceType, $forceRefresh) === true) {
                 if ($imageDataBeforeUpdate['poster_path'] !== null) {
-                    $statement = $this->dbConnection->prepare("SELECT poster_path FROM $resourceType WHERE id = ?");
+                    $posterPath = $this->dbConnection->fetchOne("SELECT poster_path FROM $resourceType WHERE id = ?", [$imageDataBeforeUpdate['id']]);
 
-                    if ($statement->executeQuery([$imageDataBeforeUpdate['id']])->fetchOne() !== $imageDataBeforeUpdate['poster_path']) {
+                    if ($posterPath !== $imageDataBeforeUpdate['poster_path']) {
                         $this->imageCacheService->deleteImageByPosterPath($imageDataBeforeUpdate['poster_path']);
                     }
                 }

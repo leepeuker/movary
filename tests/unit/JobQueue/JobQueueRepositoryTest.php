@@ -4,7 +4,7 @@ namespace Tests\Unit\Movary\JobQueue;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Movary\JobQueue\JobQueueFilter;
 use Movary\JobQueue\JobQueueRepository;
 use Movary\ValueObject\JobStatus;
@@ -151,7 +151,7 @@ class JobQueueRepositoryTest extends TestCase
     {
         /** @var Connection&MockObject $connection */
         $connection = $this->createMock(Connection::class);
-        $connection->method('getDatabasePlatform')->willReturn(new SqlitePlatform());
+        $connection->method('getDatabasePlatform')->willReturn(new SQLitePlatform());
         $connection
             ->expects(self::once())
             ->method('transactional')
@@ -178,7 +178,7 @@ class JobQueueRepositoryTest extends TestCase
     {
         /** @var Connection&MockObject $connection */
         $connection = $this->createMock(Connection::class);
-        $connection->method('getDatabasePlatform')->willReturn(new SqlitePlatform());
+        $connection->method('getDatabasePlatform')->willReturn(new SQLitePlatform());
         $connection
             ->method('transactional')
             ->willReturnCallback(static fn(callable $callback) : mixed => $callback($connection));
@@ -227,7 +227,7 @@ class JobQueueRepositoryTest extends TestCase
     {
         /** @var Connection&MockObject $connection */
         $connection = $this->createMock(Connection::class);
-        $connection->method('getDatabasePlatform')->willReturn(new SqlitePlatform());
+        $connection->method('getDatabasePlatform')->willReturn(new SQLitePlatform());
         $connection
             ->expects(self::once())
             ->method('transactional')

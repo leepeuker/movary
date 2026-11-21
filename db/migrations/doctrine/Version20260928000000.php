@@ -3,10 +3,11 @@
 namespace Movary\DatabaseMigration;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\BooleanType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -33,7 +34,7 @@ final class Version20260928000000 extends AbstractMigration
             self::applyMysqlPhysicalSchema($targetSchema);
         }
 
-        if ($this->platform instanceof SqlitePlatform) {
+        if ($this->platform instanceof SQLitePlatform) {
             self::applySqlitePhysicalSchema($targetSchema);
         }
 
@@ -429,6 +430,19 @@ final class Version20260928000000 extends AbstractMigration
 
     private static function applyMysqlPhysicalSchema(Schema $schema) : void
     {
+        // Preserve the legacy boolean declarations; DBAL 4 omits the display width.
+        foreach ($schema->getTables() as $table) {
+            foreach ($table->getColumns() as $column) {
+                if ($column->getType() instanceof BooleanType) {
+                    $definition = 'TINYINT(1)' . ($column->getNotnull() ? ' NOT NULL' : '');
+                    if ($column->getDefault() !== null) {
+                        $definition .= ' DEFAULT ' . (int)$column->getDefault();
+                    }
+                    $column->setColumnDefinition($definition);
+                }
+            }
+        }
+
         $schema->getTable('movie')->getColumn('imdb_rating_average')->setColumnDefinition(
             'DOUBLE(3,1) DEFAULT NULL',
         );

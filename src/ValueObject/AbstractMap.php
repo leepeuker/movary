@@ -8,7 +8,7 @@ use ReturnTypeWillChange;
 use Stringable;
 use function array_keys;
 use function count;
-use function spl_object_hash;
+use function spl_object_id;
 
 /**
  * @template TKey
@@ -102,7 +102,7 @@ abstract class AbstractMap implements Countable, Iterator
 
     protected function getObjectMapKey(mixed $object) : string
     {
-        return $object instanceof Stringable ? (string)$object : spl_object_hash($object);
+        return $object instanceof Stringable ? (string)$object : (string)spl_object_id($object);
     }
 
     /**

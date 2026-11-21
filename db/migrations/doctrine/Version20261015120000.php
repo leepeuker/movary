@@ -3,7 +3,7 @@
 namespace Movary\DatabaseMigration;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use RuntimeException;
@@ -17,7 +17,7 @@ final class Version20261015120000 extends AbstractMigration
 
     public function isTransactional() : bool
     {
-        return $this->platform instanceof SqlitePlatform;
+        return $this->platform instanceof SQLitePlatform;
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
@@ -30,7 +30,7 @@ final class Version20261015120000 extends AbstractMigration
             return;
         }
 
-        if ($this->platform instanceof SqlitePlatform) {
+        if ($this->platform instanceof SQLitePlatform) {
             $this->addSql('ALTER TABLE user ADD pending_email VARCHAR(255) DEFAULT NULL');
             $this->addSql('CREATE UNIQUE INDEX unique_user_pending_email ON user (pending_email)');
 
@@ -50,7 +50,7 @@ final class Version20261015120000 extends AbstractMigration
             return;
         }
 
-        if ($this->platform instanceof SqlitePlatform) {
+        if ($this->platform instanceof SQLitePlatform) {
             $this->addSql('DROP INDEX unique_user_pending_email');
             $this->addSql('ALTER TABLE user DROP COLUMN pending_email');
 

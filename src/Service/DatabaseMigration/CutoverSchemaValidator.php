@@ -4,10 +4,11 @@ namespace Movary\Service\DatabaseMigration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\Type;
 use Movary\DatabaseMigration\Version20260928000000;
 
 final class CutoverSchemaValidator
@@ -46,7 +47,7 @@ final class CutoverSchemaValidator
 
         $expectedSchema = Version20260928000000::createCutoverSchema();
         $expectedTableNames = array_map(
-            static fn (Table $table) : string => strtolower($table->getName()),
+            static fn (Table $table) : string => strtolower($table->getObjectName()->toString()),
             $expectedSchema->getTables(),
         );
         sort($expectedTableNames);
@@ -75,9 +76,9 @@ final class CutoverSchemaValidator
     private function compareTable(Table $expected, Table $actual) : array
     {
         $differences = [];
-        $tableName = $expected->getName();
-        $expectedColumnNames = array_keys($expected->getColumns());
-        $actualColumnNames = array_keys($actual->getColumns());
+        $tableName = $expected->getObjectName()->toString();
+        $expectedColumnNames = array_map(static fn (Column $column) : string => $column->getObjectName()->toString(), $expected->getColumns());
+        $actualColumnNames = array_map(static fn (Column $column) : string => $column->getObjectName()->toString(), $actual->getColumns());
 
         foreach (array_diff($expectedColumnNames, $actualColumnNames) as $columnName) {
             $differences[] = "Missing column: $tableName.$columnName";
@@ -129,7 +130,7 @@ final class CutoverSchemaValidator
         bool $actualIsPrimary,
     ) : array {
         $differences = [];
-        $columnName = $expected->getName();
+        $columnName = $expected->getObjectName()->toString();
 
         $actualNotnull = $actual->getNotnull() || $actualIsPrimary;
         if ($expected->getNotnull() !== $actualNotnull) {
@@ -154,14 +155,14 @@ final class CutoverSchemaValidator
             if ($expected->getAutoincrement() !== $actual->getAutoincrement()) {
                 $differences[] = "Auto-increment mismatch: $tableName.$columnName";
             }
-            $expectedType = $expected->getType()->getName();
+            $expectedType = Type::lookupName($expected->getType());
             if ($expectedType === 'string'
                 && ($expected->getLength() !== $actual->getLength()
                     || $expected->getFixed() !== $actual->getFixed())
             ) {
                 $differences[] = "Length mismatch: $tableName.$columnName";
             }
-            if (in_array($expectedType, ['decimal', 'float'], true)
+            if (in_array($expectedType, ['decimal', 'float', 'smallfloat'], true)
                 && ($expected->getPrecision() !== $actual->getPrecision()
                     || $expected->getScale() !== $actual->getScale())
             ) {
@@ -174,21 +175,21 @@ final class CutoverSchemaValidator
 
     private function typesAreEquivalent(Column $expected, Column $actual) : bool
     {
-        $expectedType = $expected->getType()->getName();
-        $actualType = $actual->getType()->getName();
+        $expectedType = Type::lookupName($expected->getType());
+        $actualType = Type::lookupName($actual->getType());
 
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
             $groups = [
                 ['boolean', 'smallint', 'integer', 'bigint'],
                 ['string', 'text'],
-                ['date', 'datetime', 'datetimetz', 'string', 'text'],
-                ['decimal', 'float'],
+                ['date', 'datetime', 'datetimetz', 'date_immutable', 'datetime_immutable', 'datetimetz_immutable', 'string', 'text'],
+                ['decimal', 'float', 'smallfloat'],
             ];
         } else {
             $groups = [
                 ['boolean', 'smallint', 'integer'],
-                ['datetime', 'datetimetz'],
-                ['date'],
+                ['datetime', 'datetimetz', 'datetime_immutable', 'datetimetz_immutable'],
+                ['date', 'date_immutable'],
             ];
         }
 
@@ -218,7 +219,7 @@ final class CutoverSchemaValidator
      */
     private function primaryKeyColumns(Table $table) : array
     {
-        return array_values($table->getPrimaryKey()?->getColumns() ?? []);
+        return $table->getPrimaryKey()?->getColumns() ?? [];
     }
 
     /**
@@ -248,12 +249,12 @@ final class CutoverSchemaValidator
      */
     private function actualUniqueSignatures(Table $table) : array
     {
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform === false) {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform === false) {
             return $this->uniqueSignatures($table);
         }
 
         $signatures = [];
-        foreach ($this->sqliteIndexes($table->getName()) as $index) {
+        foreach ($this->sqliteIndexes($table->getObjectName()->toString()) as $index) {
             if ($index['unique'] === true && $index['primary'] === false) {
                 $columns = $index['columns'];
                 sort($columns);
@@ -274,7 +275,7 @@ final class CutoverSchemaValidator
 
         foreach ($table->getIndexes() as $index) {
             if ($index->isPrimary() === false && $index->isUnique() === false) {
-                $columns[] = array_values($index->getColumns());
+                $columns[] = $index->getColumns();
             }
         }
 
@@ -286,8 +287,8 @@ final class CutoverSchemaValidator
      */
     private function columnsAreIndexed(Table $table, array $requiredColumns) : bool
     {
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
-            foreach ($this->sqliteIndexes($table->getName()) as $index) {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
+            foreach ($this->sqliteIndexes($table->getObjectName()->toString()) as $index) {
                 if (array_slice($index['columns'], 0, count($requiredColumns)) === $requiredColumns) {
                     return true;
                 }
@@ -331,7 +332,7 @@ final class CutoverSchemaValidator
         $primaryKey = $this->dbConnection->createSchemaManager()->introspectTable($tableName)->getPrimaryKey();
         if ($primaryKey !== null && count($primaryKey->getColumns()) === 1) {
             $indexes[] = [
-                'columns' => array_values($primaryKey->getColumns()),
+                'columns' => $primaryKey->getColumns(),
                 'primary' => true,
                 'unique' => true,
             ];
@@ -373,7 +374,7 @@ final class CutoverSchemaValidator
         if ($this->dbConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
             return $this->checkMysqlValueDomainConstraints();
         }
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform) {
             return $this->checkSqliteValueDomainConstraints();
         }
 

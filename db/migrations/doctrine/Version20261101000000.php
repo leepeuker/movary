@@ -3,7 +3,7 @@
 namespace Movary\DatabaseMigration;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use RuntimeException;
@@ -17,13 +17,13 @@ final class Version20261101000000 extends AbstractMigration
 
     public function isTransactional() : bool
     {
-        return $this->platform instanceof SqlitePlatform;
+        return $this->platform instanceof SQLitePlatform;
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function up(Schema $schema) : void
     {
-        if ($this->platform instanceof MySQLPlatform || $this->platform instanceof SqlitePlatform) {
+        if ($this->platform instanceof MySQLPlatform || $this->platform instanceof SQLitePlatform) {
             foreach (['facebook_id', 'instagram_id', 'tiktok_id', 'twitter_id', 'youtube_id', 'wikidata_id'] as $column) {
                 $this->addSql("ALTER TABLE person ADD $column VARCHAR(255) DEFAULT NULL");
             }
@@ -37,7 +37,7 @@ final class Version20261101000000 extends AbstractMigration
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function down(Schema $schema) : void
     {
-        if ($this->platform instanceof MySQLPlatform || $this->platform instanceof SqlitePlatform) {
+        if ($this->platform instanceof MySQLPlatform || $this->platform instanceof SQLitePlatform) {
             foreach (['facebook_id', 'instagram_id', 'tiktok_id', 'twitter_id', 'youtube_id', 'wikidata_id'] as $column) {
                 $this->addSql("ALTER TABLE person DROP COLUMN $column");
             }

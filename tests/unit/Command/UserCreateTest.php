@@ -24,7 +24,7 @@ class UserCreateTest extends TestCase
             ->with('user@example.com', 'short', 'user', false, true, true)
             ->willThrowException(new PasswordTooShort(15));
         $command = new UserCreate($userApi, $this->createStub(LoggerInterface::class));
-        (new Application())->add($command);
+        (new Application())->addCommand($command);
         $tester = new CommandTester($command);
 
         $result = $tester->execute([
@@ -48,7 +48,7 @@ class UserCreateTest extends TestCase
             ->method('createUser')
             ->with('user@example.com', 'password', 'user', false, false, false);
         $command = new UserCreate($userApi, $this->createStub(LoggerInterface::class));
-        (new Application())->add($command);
+        (new Application())->addCommand($command);
         $tester = new CommandTester($command);
 
         $result = $tester->execute([
@@ -68,7 +68,7 @@ class UserCreateTest extends TestCase
         $userApi = $this->createMock(UserApi::class);
         $userApi->expects(self::never())->method('createUser');
         $command = new UserCreate($userApi, $this->createStub(LoggerInterface::class));
-        (new Application())->add($command);
+        (new Application())->addCommand($command);
         $tester = new CommandTester($command);
 
         $result = $tester->execute([

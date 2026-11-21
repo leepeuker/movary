@@ -1,6 +1,6 @@
 FROM composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 AS composer
 
-FROM php:8.5.12-fpm-alpine3.24@sha256:64535609509e0fd5c8529359e6b599a68ce42089defd565f7881efdae7687cea AS base
+FROM php:8.6.0-fpm-alpine3.24@sha256:3892978a38794b348f73d6926fb63e352b5338f8b302cdd2cf0ed968f63b50c5 AS base
 
 LABEL Description="Movary is a self hosted web app to track and rate your watched movies"
 LABEL Maintainer="Lee Peuker"
@@ -13,11 +13,13 @@ RUN apk upgrade --no-cache \
     bash \
     curl \
     libzip \
+    oniguruma \
     nginx \
     supervisor \
     && apk add --no-cache --virtual .php-extension-build-dependencies \
     libzip-dev \
-    && docker-php-ext-install pdo_mysql zip \
+    oniguruma-dev \
+    && docker-php-ext-install mbstring pdo_mysql zip \
     && apk del .php-extension-build-dependencies
 
 # Keep the PHP path used by the entrypoint and Supervisor configuration.
@@ -97,30 +99,7 @@ COPY --from=production-dependencies --chown=application:application /app/vendor 
 
 FROM base AS development
 
-USER root
-
-RUN apk add --no-cache \
-    --virtual .xdebug-build-dependencies \
-    $PHPIZE_DEPS \
-    linux-headers \
-    && pecl install xdebug-3.5.3 \
-    && apk del .xdebug-build-dependencies
-
-ARG XDEBUG_INI="$PHP_INI_DIR/conf.d/xdebug.ini"
-RUN echo 'zend_extension=xdebug.so' > "$XDEBUG_INI" \
-    && echo "[xdebug]" >> "$XDEBUG_INI" \
-    && echo "xdebug.mode=\${XDEBUG_MODE:-off}" >> "$XDEBUG_INI" \
-    && echo "xdebug.discover_client_host=true" >> "$XDEBUG_INI" \
-    && echo "xdebug.start_with_request=yes" >> "$XDEBUG_INI" \
-    && echo "xdebug.trigger_value=yes" >> "$XDEBUG_INI" \
-    && echo "xdebug.log_level=0" >> "$XDEBUG_INI" \
-    && echo "xdebug.idekey=docker" >> "$XDEBUG_INI" \
-    && echo "xdebug.client_host=\${XDEBUG_HOST:-host.docker.internal}" >> "$XDEBUG_INI" \
-    && echo "xdebug.client_port=\${XDEBUG_PORT:-9003}" >> "$XDEBUG_INI"
-
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 COPY --chown=application:application ./ /app
-
-USER application
 
 RUN composer install --no-interaction --no-progress --prefer-dist

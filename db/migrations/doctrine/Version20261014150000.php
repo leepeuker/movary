@@ -3,7 +3,7 @@
 namespace Movary\DatabaseMigration;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use RuntimeException;
@@ -24,7 +24,7 @@ final class Version20261014150000 extends AbstractMigration
             return;
         }
 
-        if ($this->platform instanceof SqlitePlatform) {
+        if ($this->platform instanceof SQLitePlatform) {
             $this->addSql(
                 'ALTER TABLE user ADD is_enabled BOOLEAN DEFAULT 1 NOT NULL CHECK (is_enabled IN (0, 1))',
             );

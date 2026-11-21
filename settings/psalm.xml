@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <psalm
     resolveFromConfigFile="false"
+    runTaintAnalysis="false"
     hideExternalErrors="true"
     findUnusedBaselineEntry="false"
     findUnusedCode="false"
@@ -52,12 +53,6 @@
                 <directory name="tests/unit"/>
             </errorLevel>
         </PossiblyUndefinedMethod>
-
-        <UndefinedMagicMethod>
-            <errorLevel type="suppress">
-                <directory name="tests/unit"/>
-            </errorLevel>
-        </UndefinedMagicMethod>
     </issueHandlers>
 
     <plugins>

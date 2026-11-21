@@ -55,18 +55,18 @@ class SyncMovieTest extends TestCase
             ->expects(self::once())
             ->method('updateDetails')
             ->with(
-                movieId: 12,
-                tagline: null,
-                overview: null,
-                originalLanguage: 'en',
-                releaseDate: null,
-                runtime: 90,
-                tmdbVoteAverage: 7.0,
-                tmdbVoteCount: 10,
-                tmdbPosterPath: '/new-default.jpg',
-                tmdbBackdropPath: null,
-                imdbId: null,
-                originalTitle: 'Movie',
+                12,
+                null,
+                null,
+                'en',
+                null,
+                90,
+                7.0,
+                10,
+                '/new-default.jpg',
+                null,
+                null,
+                'Movie',
             )
             ->willReturn($afterSync);
 

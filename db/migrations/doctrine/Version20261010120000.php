@@ -3,7 +3,7 @@
 namespace Movary\DatabaseMigration;
 
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use RuntimeException;
@@ -17,7 +17,7 @@ final class Version20261010120000 extends AbstractMigration
 
     public function isTransactional() : bool
     {
-        return $this->platform instanceof SqlitePlatform;
+        return $this->platform instanceof SQLitePlatform;
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
@@ -34,7 +34,7 @@ final class Version20261010120000 extends AbstractMigration
 
         if ($this->platform instanceof MySQLPlatform) {
             $this->createMysqlTable();
-        } elseif ($this->platform instanceof SqlitePlatform) {
+        } elseif ($this->platform instanceof SQLitePlatform) {
             $this->createSqliteTable();
         } else {
             throw new RuntimeException('Unsupported database platform: ' . $this->platform::class);

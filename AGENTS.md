@@ -25,7 +25,7 @@ autonomous.**
 ## 1. Project overview
 
 - Movary is a PHP web app to track/rate/explore movie watch history (see `README.md`).
-- Backend: PHP 8.5, custom routing via `nikic/fast-route` (`settings/routes.php`), PHP-DI
+- Backend: PHP 8.6, custom routing via `nikic/fast-route` (`settings/routes.php`), PHP-DI
   for dependency injection, Doctrine DBAL for persistence, Phinx for migrations.
 - Frontend: server-rendered Twig templates (`/templates`) + vanilla JS/CSS (`/public`). No
   SPA framework — keep changes consistent with this style, don't introduce new frontend
@@ -53,7 +53,7 @@ make build_development     # builds dev image, installs composer deps, migrates 
 ```
 
 If Docker isn't available, PHP dependencies can be installed directly with Composer
-(`composer install`) provided a compatible PHP 8.5 environment exists locally.
+(`composer install`) provided a compatible PHP 8.6 environment exists locally.
 
 By default the dev setup uses SQLite. To test against MySQL instead, use
 `docker-compose.mysql.yml` (see `docs/development/setup.md`) — do this when a change touches
@@ -104,7 +104,7 @@ Or all at once: `composer test` (inside the container: `make composer_test`).
   and never remove existing comments unless they're factually wrong.
 - Raw SQL must work on **both** MySQL and SQLite. Avoid backend-specific functions (e.g.
   `YEAR()`, `DATE_SUB()`, `strftime()`, `datetime()`) unless you branch on
-  `$this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform` like the existing
+  `$this->dbConnection->getDatabasePlatform() instanceof SQLitePlatform` like the existing
   repositories do. Passing tests on the default SQLite setup does not prove MySQL works.
 
 ## 6. What AI agents should and should not do autonomously

@@ -7,7 +7,6 @@ use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\JobScheduleCronExpression;
 use Movary\ValueObject\JobType;
-use RuntimeException;
 
 class JobScheduleRepository
 {
@@ -32,12 +31,7 @@ class JobScheduleRepository
             'created_at' => (string)DateTime::create(),
         ]);
 
-        $id = $this->dbConnection->lastInsertId();
-        if ($id === false) {
-            throw new RuntimeException('Could not get last inserted job schedule id.');
-        }
-
-        return (int)$id;
+        return (int)$this->dbConnection->lastInsertId();
     }
 
     public function delete(int $id) : bool

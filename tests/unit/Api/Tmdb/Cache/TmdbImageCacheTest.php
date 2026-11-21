@@ -5,7 +5,6 @@ namespace Tests\Unit\Movary\Api\Tmdb\Cache;
 use ArrayIterator;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Statement;
 use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Service\ImageCacheService;
@@ -30,19 +29,13 @@ class TmdbImageCacheTest extends TestCase
             'tmdb_poster_path_override' => '/override.jpg',
         ]]));
 
-        $select = $this->createMock(Statement::class);
-        $select->expects(self::once())->method('executeQuery')->with([])->willReturn($result);
-        $update = $this->createMock(Statement::class);
-        $update->expects(self::once())->method('executeStatement')->with(['/cached.jpg', 12])->willReturn(1);
-
         $connection = $this->createMock(Connection::class);
-        $connection
-            ->expects(self::exactly(2))
-            ->method('prepare')
-            ->willReturnMap([
-                ['SELECT id, poster_path, tmdb_poster_path, tmdb_poster_path_override FROM movie', $select],
-                ['UPDATE movie SET poster_path = ? WHERE id = ?', $update],
-            ]);
+        $connection->expects(self::once())->method('executeQuery')
+            ->with('SELECT id, poster_path, tmdb_poster_path, tmdb_poster_path_override FROM movie', [])
+            ->willReturn($result);
+        $connection->expects(self::once())->method('executeStatement')
+            ->with('UPDATE movie SET poster_path = ? WHERE id = ?', ['/cached.jpg', 12])
+            ->willReturn(1);
 
         $urlGenerator = $this->createMock(TmdbUrlGenerator::class);
         $urlGenerator
@@ -76,18 +69,13 @@ class TmdbImageCacheTest extends TestCase
             'tmdb_poster_path' => '/default.jpg',
             'tmdb_poster_path_override' => '/selected.jpg',
         ]]));
-        $select = $this->createMock(Statement::class);
-        $select->expects(self::once())->method('executeQuery')->with([])->willReturn($result);
-        $update = $this->createMock(Statement::class);
-        $update->expects(self::once())->method('executeStatement')->with(['/cached.jpg', 12])->willReturn(1);
         $connection = $this->createMock(Connection::class);
-        $connection
-            ->expects(self::exactly(2))
-            ->method('prepare')
-            ->willReturnMap([
-                ['SELECT id, poster_path, tmdb_poster_path, tmdb_poster_path_override FROM person', $select],
-                ['UPDATE person SET poster_path = ? WHERE id = ?', $update],
-            ]);
+        $connection->expects(self::once())->method('executeQuery')
+            ->with('SELECT id, poster_path, tmdb_poster_path, tmdb_poster_path_override FROM person', [])
+            ->willReturn($result);
+        $connection->expects(self::once())->method('executeStatement')
+            ->with('UPDATE person SET poster_path = ? WHERE id = ?', ['/cached.jpg', 12])
+            ->willReturn(1);
         $urlGenerator = $this->createMock(TmdbUrlGenerator::class);
         $urlGenerator->expects(self::once())->method('generateImageUrl')->with('/selected.jpg')
             ->willReturn(Url::createFromString('https://example.com/selected.jpg'));
