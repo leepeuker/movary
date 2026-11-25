@@ -2,7 +2,7 @@
 
 namespace Movary\DatabaseMigration;
 
-use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -29,7 +29,7 @@ final class Version20261029000000 extends AbstractMigration
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function up(Schema $schema) : void
     {
-        if ($this->platform instanceof MySQLPlatform === false && $this->platform instanceof SQLitePlatform === false) {
+        if ($this->platform instanceof AbstractMySQLPlatform === false && $this->platform instanceof SQLitePlatform === false) {
             throw new RuntimeException('Unsupported database platform: ' . $this->platform::class);
         }
 
@@ -83,7 +83,7 @@ final class Version20261029000000 extends AbstractMigration
 
     private function createStagingTable() : void
     {
-        if ($this->platform instanceof MySQLPlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform) {
             $this->connection->executeStatement(
                 'CREATE TABLE ' . self::STAGING_TABLE . ' (
                     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -192,7 +192,7 @@ final class Version20261029000000 extends AbstractMigration
 
     private function replaceTable() : void
     {
-        if ($this->platform instanceof MySQLPlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform) {
             $this->connection->executeStatement(
                 'RENAME TABLE movie_user_watch_dates TO ' . self::BACKUP_TABLE . ', '
                 . self::STAGING_TABLE . ' TO movie_user_watch_dates',
@@ -214,7 +214,7 @@ final class Version20261029000000 extends AbstractMigration
 
     private function tableExists(string $tableName) : bool
     {
-        if ($this->platform instanceof MySQLPlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform) {
             return $this->connection->fetchOne(
                 'SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?',
                 [$tableName],

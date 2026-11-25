@@ -2,7 +2,7 @@
 
 namespace Movary\DatabaseMigration;
 
-use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -32,7 +32,7 @@ final class Version20261010120000 extends AbstractMigration
             'SELECT user_id, token, created_at FROM user_api_token',
         );
 
-        if ($this->platform instanceof MySQLPlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform) {
             $this->createMysqlTable();
         } elseif ($this->platform instanceof SQLitePlatform) {
             $this->createSqliteTable();
@@ -59,7 +59,7 @@ final class Version20261010120000 extends AbstractMigration
 
         $this->addSql('DROP TABLE user_api_token');
 
-        if ($this->platform instanceof MySQLPlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform) {
             $this->addSql('RENAME TABLE user_api_token_new TO user_api_token');
 
             return;

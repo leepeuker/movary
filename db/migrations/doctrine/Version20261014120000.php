@@ -2,7 +2,7 @@
 
 namespace Movary\DatabaseMigration;
 
-use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -18,7 +18,7 @@ final class Version20261014120000 extends AbstractMigration
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function up(Schema $schema) : void
     {
-        if ($this->platform instanceof MySQLPlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform) {
             $this->addSql('ALTER TABLE user ADD last_login_at DATETIME DEFAULT NULL');
 
             return;
