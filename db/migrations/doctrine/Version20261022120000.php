@@ -2,7 +2,7 @@
 
 namespace Movary\DatabaseMigration;
 
-use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -23,7 +23,7 @@ final class Version20261022120000 extends AbstractMigration
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function up(Schema $schema) : void
     {
-        if ($this->platform instanceof MySQLPlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform) {
             $this->addSql(
                 <<<'SQL'
                 CREATE TABLE movie_user_review (
@@ -73,7 +73,7 @@ final class Version20261022120000 extends AbstractMigration
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function down(Schema $schema) : void
     {
-        if ($this->platform instanceof MySQLPlatform || $this->platform instanceof SQLitePlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform || $this->platform instanceof SQLitePlatform) {
             $this->addSql('DROP TABLE movie_user_review');
 
             return;

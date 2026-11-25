@@ -2,7 +2,7 @@
 
 namespace Movary\DatabaseMigration;
 
-use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -23,7 +23,7 @@ final class Version20261030000000 extends AbstractMigration
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function up(Schema $schema) : void
     {
-        if ($this->platform instanceof MySQLPlatform || $this->platform instanceof SQLitePlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform || $this->platform instanceof SQLitePlatform) {
             $this->addSql('ALTER TABLE person ADD tmdb_poster_path_override VARCHAR(255) DEFAULT NULL');
 
             return;
@@ -35,7 +35,7 @@ final class Version20261030000000 extends AbstractMigration
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function down(Schema $schema) : void
     {
-        if ($this->platform instanceof MySQLPlatform || $this->platform instanceof SQLitePlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform || $this->platform instanceof SQLitePlatform) {
             $this->addSql('ALTER TABLE person DROP COLUMN tmdb_poster_path_override');
 
             return;
